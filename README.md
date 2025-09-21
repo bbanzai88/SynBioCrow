@@ -32,3 +32,5 @@ Limitations: Dependent on data quality; interpretability may be low.
 Rule/template-based (hand-crafted biotransformation rules)
 Similarity-based (find close known enzymes/reactions)
 ML/data-driven (predict transformations with models) 
+
+The current plan is to use all three approaches to ensure (as much as possible) getting coverage for many, if not all potential desired compunds.
