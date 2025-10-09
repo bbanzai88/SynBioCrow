@@ -1,7 +1,36 @@
 # SynBioCrow
 SynBioCrow is an open source package for the accurate solution of reasoning-intensive synthetic biology tasks. It is based conceptually on the ChemCrow project. Please see the following paper: Bran, Andres M., et al. "ChemCrow: Augmenting large-language models with chemistry tools." arXiv preprint arXiv:2304.05376 (2023).
 
-Built with Langchain, it uses a collection of chemical and synthetic biology tools including RDKit, paper-qa, Galaxy-SynBioCAD pipeline for synthetic biology design and engineering, and others. Ultimately, the  goal is to  expand it into a Design Build Test and Learn (DBTL) tool that can take a desired compound, identify the  best pathway(s) and give the design for a cassette of sequence that can be ordered and inserted into the chassis of choice (Saccharomyces or Ecoli, to  start).   From  there the the design can be tested and improved (Hence the  learn part). For the  design part, we will be using open source bioretrosynthesis programs. Bioretrosynthesis is a bit different from classical organic retrosynthesis. It’s the process of designing metabolic pathways backwards from a target compound to simpler precursors that enzymes or microbes can produce. The literature usually describes three main approaches:
+This system as it now stands is an automated end-to-end bio-retrosynthesis and design platform that integrates multiple computational tools into a unified LangGraph-based workflow. It identifies, evaluates, and simulates novel enzymatic pathways for the biosynthesis of target molecules, combining retrosynthetic search, enzyme selection, thermodynamic filtering, and metabolic simulation.
+
+Key Capabilities:
+
+Automated Retrosynthesis (RetroBioCat2)
+Generates de novo biochemical pathways from a target molecule’s SMILES.
+Performs Monte Carlo Tree Search (MCTS) over reaction rules to explore feasible routes.
+Pathway Extraction & Annotation
+Converts retrosynthesis outputs into structured reaction tables (substrates, products, scores).
+Integrates similarity metrics, prior precedents, and enzyme reaction type metadata.
+Thermodynamic & Ranking Modules
+Uses dGPredictor / eQuilibrator to estimate Gibbs free energies (ΔG′).
+Ranks pathways based on combined heuristic and thermodynamic feasibility scores.
+Enzyme Identification (Selenzyme)
+Predicts candidate enzymes for each step, optionally scraping Selenzyme for activity and organism data.
+Metabolic Simulation (COBRApy / novoStoic)
+Constructs toy stoichiometric models for top-ranked pathways.
+Runs flux balance analysis (FBA) to estimate steady-state feasibility and pathway yield.
+Sequence Ranking + Design of Experiments (DoE)
+Build / Approval / Export Workflow
+Produces pathway briefs, annotated CSVs/JSONs, simulation flux tables, and an export manifest for downstream integration or lab validation.
+List item
+Technical Architecture
+
+LangGraph orchestration: modular “nodes” for each stage (retrosynthesis, extract, thermo, rank, simulate, selenzyme, seqrank, doe, build, approve, export).
+Micromamba-based environment isolation ensures reproducible dependency management per run.
+Streaming execution & checkpointed state allow resuming or extending pipelines dynamically.
+Output artifacts (CSV, JSON, Markdown) capture every stage for transparency and reproducibility.
+
+Built with Langchain, it uses a collection of open source chemical and synthetic biology tools. Ultimately, the  goal is to futher expand it into a Design Build Test and Learn (DBTL) tool that can take a desired compound, identify the  best pathway(s) and give the design for a cassette of sequence that can be ordered and inserted into the chassis of choice (Saccharomyces or Ecoli, to  start).   From  there the the design can be tested and improved (hence the testing and learning parts). For the  design part (once we get everything  else working), we will be using multiple open source bioretrosynthesis programs. Bioretrosynthesis is a bit different from classical organic retrosynthesis. It’s the process of designing metabolic pathways backwards from a target compound to simpler precursors that enzymes or microbes can produce. The literature usually describes three main approaches:
 
 1. Template-Based (Rule-Based) Bioretrosynthesis
 
@@ -23,7 +52,7 @@ Limitations: Biased toward known reactions; limited novelty.
 
 Uses statistical, ML, or neural models trained on large biochemical reaction datasets to predict possible disconnections.
 Can generalize beyond known rules by learning patterns of enzymatic transformations.
-Tools: DeepPath, RetroBioCat (hybrid ML + rules), BioNavi-NP.
+Tools: DeepPath, RetroBioCat2 (hybrid ML + rules), BioNavi-NP.
 Strengths: Can discover novel, non-obvious routes.
 Limitations: Dependent on data quality; interpretability may be low.
 
@@ -33,4 +62,6 @@ Rule/template-based (hand-crafted biotransformation rules)
 Similarity-based (find close known enzymes/reactions)
 ML/data-driven (predict transformations with models) 
 
-The current plan is to use all three approaches to ensure (as much as possible) getting coverage for many, if not all potential desired compunds.
+The current plan is to use all three approaches to ensure (as much as possible) getting coverage for many, if not all potential desired compounds. Other approaches that may get explored include:
+(1) Using an ensemble retrosynthesis approach to identify the best possible pathway (syntheus or chemeric?) and somehow convert to a retrobiosyntheis approach using perhaps a hybrid non-enzymatic and regular chemistry approach ..
+(2) Use an approach utilizing enzyme design..
